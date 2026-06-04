@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tripletex Prototyping System</title>
+  <title>Prototyper – Tripletex</title>
   <link rel="stylesheet" href="https://cdn.tripletex.no/google-fonts/rubik-400-500-800.css">
   <link rel="stylesheet" href="_system/tokens.css">
   <style>
@@ -17,7 +17,7 @@
       padding: var(--space-64) var(--space-32);
     }
 
-    .page { width: 100%; max-width: 600px; margin: 0 auto; }
+    .page { width: 100%; max-width: 720px; margin: 0 auto; }
 
     .header { margin-bottom: var(--space-40); }
 
@@ -38,90 +38,117 @@
     .header-desc {
       font: 14px/1.6 "Rubik", sans-serif;
       color: var(--text-muted);
-      max-width: 480px;
     }
 
-    .section { margin-bottom: var(--space-32); }
-
-    .section-label {
-      font: 500 12px/1 "Rubik", sans-serif;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: var(--space-12);
-    }
-
-    .cards { display: flex; flex-direction: column; gap: var(--space-8); }
-
-    .card {
-      display: flex;
-      align-items: center;
-      gap: var(--space-16);
-      padding: var(--space-16) var(--space-20);
+    /* Prototype-kort */
+    .proto-card {
       background: var(--surface-default);
       border: 1px solid var(--border-muted);
       border-radius: var(--radius-default);
-      text-decoration: none;
-      color: inherit;
-      transition: border-color 0.15s, box-shadow 0.15s;
+      margin-bottom: var(--space-16);
+      overflow: hidden;
     }
 
-    .card:hover {
-      border-color: var(--border-hover);
-      box-shadow: 0 2px 10px rgba(10, 65, 250, 0.07);
-    }
-
-    .card-icon {
-      width: var(--size-large);
-      height: var(--size-large);
-      background: var(--surface-info-rest);
-      border-radius: var(--radius-default);
+    .proto-card-header {
       display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--text-action);
-      flex-shrink: 0;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: var(--space-16);
+      padding: var(--space-20) var(--space-24);
+      border-bottom: 1px solid var(--border-faint);
     }
 
-    .card-icon--system {
-      background: var(--surface-background);
-      border: 1px solid var(--border-muted);
-      color: var(--text-muted);
-    }
-
-    .card-body { flex: 1; min-width: 0; }
-
-    .card-title {
-      font: 500 15px/1.3 "Rubik", sans-serif;
+    .proto-card-title {
+      font: 500 16px/1.3 "Rubik", sans-serif;
       color: var(--text-primary);
-      margin-bottom: var(--space-2);
+      margin-bottom: var(--space-4);
     }
 
-    .card-desc {
-      font: 13px/1.4 "Rubik", sans-serif;
-      color: var(--text-muted);
-    }
-
-    .card-arrow { color: var(--border-secondary); flex-shrink: 0; }
-    .card:hover .card-arrow { color: var(--text-action); }
-
-    .divider {
-      border: none;
-      border-top: 1px solid var(--border-faint);
-      margin: var(--space-32) 0;
-    }
-
-    .footer {
+    .proto-card-desc {
       font: 13px/1.5 "Rubik", sans-serif;
       color: var(--text-muted);
     }
 
-    .footer a {
-      color: var(--text-action);
-      text-decoration: none;
+    .proto-card-meta {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: var(--space-8);
+      flex-shrink: 0;
     }
 
-    .footer a:hover { text-decoration: underline; }
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-4);
+      font: 12px/1 "Rubik", sans-serif;
+      padding: var(--space-4) var(--space-8);
+      border-radius: var(--radius-full);
+    }
+
+    .status-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    .status-badge--active {
+      background: var(--surface-success-rest);
+      color: var(--text-primary);
+    }
+    .status-badge--active::before { background: var(--surface-success-active); }
+
+    .status-badge--wip {
+      background: var(--surface-warning-rest);
+      color: var(--text-primary);
+    }
+    .status-badge--wip::before { background: var(--surface-warning-active); }
+
+    .status-badge--planned {
+      background: var(--surface-background);
+      border: 1px solid var(--border-muted);
+      color: var(--text-muted);
+    }
+    .status-badge--planned::before { background: var(--border-muted); }
+
+    .proto-date {
+      font: 12px/1 "Rubik", sans-serif;
+      color: var(--text-muted);
+    }
+
+    /* Sideliste */
+    .proto-pages {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+
+    .proto-page-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-8);
+      padding: var(--space-12) var(--space-24);
+      text-decoration: none;
+      color: var(--text-action);
+      font-size: 14px;
+      border-right: 1px solid var(--border-faint);
+      border-bottom: 1px solid var(--border-faint);
+      transition: background 0.1s;
+    }
+
+    .proto-page-link:hover {
+      background: var(--surface-info-rest);
+    }
+
+    .proto-page-link svg {
+      flex-shrink: 0;
+      color: var(--border-muted);
+    }
+
+    .proto-page-link:hover svg {
+      color: var(--text-action);
+    }
   </style>
 </head>
 <body>
@@ -130,98 +157,56 @@
 
   <div class="header">
     <div class="header-eyebrow">Tripletex</div>
-    <h1 class="header-title">Prototyping System</h1>
-    <p class="header-desc">
-      Ferdige maler og et komponent-bibliotek for å lage HTML/CSS-prototyper
-      som bruker Tripletex sine designtokens konsekvent.
-    </p>
+    <h1 class="header-title">Prototyper</h1>
+    <p class="header-desc">Oversikt over HTML/CSS-prototyper. Klikk på en side for å åpne den.</p>
   </div>
 
-  <!-- MALER -->
-  <div class="section">
-    <div class="section-label">Maler</div>
-    <div class="cards">
-
-      <a class="card" href="_templates/side-med-tabell.html" target="_blank" rel="noopener">
-        <div class="card-icon">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <rect x="3" y="4" width="14" height="13" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M3 8h14" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M8 8v9" stroke="currentColor" stroke-width="1.4"/>
-          </svg>
-        </div>
-        <div class="card-body">
-          <div class="card-title">Side med tabell</div>
-          <div class="card-desc">App-shell, navigasjon, tabell med filter og badges</div>
-        </div>
-        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-
-      <a class="card" href="_templates/side-med-skjema.html" target="_blank" rel="noopener">
-        <div class="card-icon">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <rect x="3" y="3" width="14" height="14" rx="1.5" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M6 7h8M6 10h8M6 13h5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="card-body">
-          <div class="card-title">Side med skjema</div>
-          <div class="card-desc">App-shell, brødsmuler, skjemakort med inputs og feil-tilstand</div>
-        </div>
-        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </a>
-
+  <!-- Absence v1 -->
+  <div class="proto-card">
+    <div class="proto-card-header">
+      <div>
+        <div class="proto-card-title">Fravær og ferie</div>
+        <div class="proto-card-desc">Fraværsoversikt, inntektsmeldinger, avstemming av refusjoner, statistikk, SSB-rapporter og innstillinger</div>
+      </div>
+      <div class="proto-card-meta">
+        <span class="status-badge status-badge--wip">Under arbeid</span>
+        <span class="proto-date">Oppdatert 4. juni 2026</span>
+      </div>
     </div>
-  </div>
-
-  <!-- SYSTEM -->
-  <div class="section">
-    <div class="section-label">System</div>
-    <div class="cards">
-
-      <a class="card" href="_system/REGLER.md" target="_blank" rel="noopener">
-        <div class="card-icon card-icon--system">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M5 4h10a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1Z" stroke="currentColor" stroke-width="1.4"/>
-            <path d="M7 8h6M7 11h6M7 14h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
-          </svg>
-        </div>
-        <div class="card-body">
-          <div class="card-title">REGLER.md</div>
-          <div class="card-desc">Tokenoversikt, komponentklasser og regler for prototyping</div>
-        </div>
-        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+    <div class="proto-pages">
+      <a class="proto-page-link" href="prototyper/absence-v1/fravaersoversikt.html" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Fraværsoversikt
       </a>
-
-      <a class="card" href="_system/tokens.css" target="_blank" rel="noopener">
-        <div class="card-icon card-icon--system">
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M7 5l-4 5 4 5M13 5l4 5-4 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="card-body">
-          <div class="card-title">tokens.css</div>
-          <div class="card-desc">Alle design-tokens — farger, spacing, størrelser og radius</div>
-        </div>
-        <svg class="card-arrow" width="16" height="16" viewBox="0 0 16 16" fill="none">
-          <path d="M6 3l5 5-5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
+      <a class="proto-page-link" href="prototyper/absence-v1/inntektsmeldinger.html" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Inntektsmeldinger
       </a>
-
+      <a class="proto-page-link" href="prototyper/absence-v1/inntektsmeldinger-skjema.html" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Send inntektsmelding
+      </a>
+      <a class="proto-page-link" href="prototyper/absence-v1/avstemming-refusjoner.html" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Avstemming av refusjoner
+      </a>
+      <a class="proto-page-link" href="prototyper/absence-v1/statistikk.html" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Statistikk
+      </a>
+      <a class="proto-page-link" href="prototyper/absence-v1/ssb-rapporter.html" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        SSB-rapporter
+      </a>
+      <a class="proto-page-link" href="prototyper/absence-v1/ssb-rapporter-send.html" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Send SSB-rapport
+      </a>
+      <a class="proto-page-link" href="prototyper/absence-v1/innstillinger.html" target="_blank">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Innstillinger
+      </a>
     </div>
-  </div>
-
-  <hr class="divider">
-
-  <div class="footer">
-    Komponentene er basert på <a href="https://atlas.tripletex.dev" target="_blank" rel="noopener">Atlas</a> – Tripletex sitt designsystem.
-    Nye prototyper legges i <code>prototyper/</code>-mappen.
   </div>
 
 </div>
