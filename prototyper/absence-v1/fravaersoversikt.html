@@ -790,6 +790,117 @@
       color: var(--text-primary);
     }
 
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      z-index: 200;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal {
+      background: var(--surface-default);
+      border-radius: var(--radius-default);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
+      width: 660px;
+      max-width: calc(100vw - var(--space-48));
+      max-height: calc(100vh - var(--space-48));
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-24) var(--space-24) var(--space-20);
+    }
+    .modal-title {
+      font: 500 20px/1.3 "Rubik", sans-serif;
+      color: var(--text-primary);
+    }
+    .modal-close {
+      width: var(--size-large);
+      height: var(--size-large);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-default);
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .modal-close:hover { background: var(--action-neutral-hover); }
+    .modal-close svg { width: 16px; height: 16px; }
+    .modal-body {
+      padding: var(--space-4) var(--space-24) var(--space-24);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-20);
+    }
+    .modal-footer {
+      display: flex;
+      gap: var(--space-8);
+      padding: var(--space-20) var(--space-24) var(--space-24);
+      border-top: 1px solid var(--border-muted);
+    }
+    .modal-date-row {
+      display: flex;
+      gap: var(--space-16);
+    }
+    .modal-date-row .form-group { flex: 1; margin: 0; }
+    .input-date-wrap { position: relative; }
+    .input-date-wrap .input { padding-right: var(--space-40); }
+    .input-date-icon {
+      position: absolute;
+      right: var(--space-12);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Mitt fravær — kvotekort */
+    .mitt-stats {
+      display: flex;
+      gap: var(--space-16);
+      flex-shrink: 0;
+    }
+    .stat-card {
+      flex: 1;
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-default);
+      background: var(--surface-default);
+      padding: var(--space-16) var(--space-20);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-8);
+    }
+    .stat-card-label {
+      font: 14px/1.4 "Rubik", sans-serif;
+      color: var(--text-muted);
+    }
+    .stat-card-value {
+      font: 500 28px/1.2 "Rubik", sans-serif;
+      color: var(--text-primary);
+      font-feature-settings: 'lnum' 1, 'tnum' 1;
+    }
+    .stat-card-multi {
+      display: flex;
+      gap: var(--space-32);
+    }
+    .stat-card-sub {
+      display: block;
+      font: 14px/1.4 "Rubik", sans-serif;
+      color: var(--text-muted);
+    }
+
   </style>
 </head>
 <body>
@@ -860,7 +971,7 @@
         <div class="page-header">
           <h1 class="page-title">Fraværsoversikt</h1>
           <div class="page-actions">
-            <button class="btn btn-primary">
+            <button class="btn btn-primary" onclick="openNyttFravaer()">
               Registrer fravær
               <svg width="16" height="16" viewBox="0 0 20 20" fill="none"><path d="M5 10h10M10 5v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
             </button>
@@ -869,16 +980,17 @@
 
         <!-- TABS -->
         <div class="tx-tabs">
-          <button class="tx-tab tx-tab--active">
+          <button class="tx-tab tx-tab--active" id="tab-btn-ansatte" onclick="switchTab('ansatte')">
             Ansattes fravær
             <span class="tx-tab-underline"></span>
           </button>
-          <button class="tx-tab">
+          <button class="tx-tab" id="tab-btn-mitt" onclick="switchTab('mitt')">
             Mitt fravær
             <span class="tx-tab-underline"></span>
           </button>
         </div>
 
+        <div id="tab-ansatte" style="display:contents;">
         <!-- INNHOLDSKORT med split view -->
         <div class="content-card">
 
@@ -2034,6 +2146,726 @@
 
         </div>
         <!-- /content-card -->
+        </div><!-- /tab-ansatte -->
+
+        <!-- TAB: Mitt fravær -->
+        <div id="tab-mitt" style="display:none;">
+
+          <!-- KVOTEKORT -->
+          <div class="mitt-stats">
+            <div class="stat-card">
+              <span class="stat-card-label">Feriedager</span>
+              <span class="stat-card-value">12/25</span>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card-label">Egenmeldingskvote</span>
+              <div class="stat-card-multi">
+                <div>
+                  <span class="stat-card-value">8/12</span>
+                  <span class="stat-card-sub">Dager (maks 3 per periode)</span>
+                </div>
+                <div>
+                  <span class="stat-card-value">3/4</span>
+                  <span class="stat-card-sub">Perioder</span>
+                </div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <span class="stat-card-label">Omsorgsdager</span>
+              <span class="stat-card-value">3/10</span>
+            </div>
+          </div>
+
+          <!-- INNHOLDSKORT -->
+          <div class="content-card">
+
+            <div class="table-toolbar">
+              <div class="table-toolbar-filters">
+                <div class="input-search-wrap">
+                  <input class="input" type="search" placeholder="Søk...">
+                  <svg class="input-search-icon" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+                </div>
+              </div>
+            </div>
+
+            <div class="split-body">
+
+              <!-- VENSTRE: Ingrid sine fravær -->
+              <div class="split-left" id="mitt-split-left">
+
+                <div id="mitt-card-ferie1" class="absence-item absence-item--priority" onclick="selectMittAbsence('mitt-card-ferie1', 'mitt-detail-ferie')">
+                  <div class="absence-item-content">
+                    <div class="absence-meta">
+                      <span class="absence-avatar">IR</span>
+                      <span class="absence-name absence-name--light">Ingrid Reigstad</span>
+                      <span class="absence-sep">·</span>
+                      <span class="absence-type absence-type--light">Ferie</span>
+                    </div>
+                    <div class="absence-dates-row">
+                      <span class="absence-dates">18.11.26–21.11.26</span>
+                      <span class="chip">4 dager</span>
+                    </div>
+                  </div>
+                  <div class="absence-item-right">
+                    <span class="status-dot status-dot--warning">Til godkjenning</span>
+                    <button class="absence-kebab" onclick="event.stopPropagation()"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15" r="1.2" fill="currentColor"/></svg></button>
+                  </div>
+                </div>
+
+                <div id="mitt-card-eg1" class="absence-item" onclick="selectMittAbsence('mitt-card-eg1', 'mitt-detail-egenmelding')">
+                  <div class="absence-item-content">
+                    <div class="absence-meta">
+                      <span class="absence-avatar">IR</span>
+                      <span class="absence-name">Ingrid Reigstad</span>
+                      <span class="absence-sep">·</span>
+                      <span class="absence-type">Egenmelding</span>
+                    </div>
+                    <div class="absence-dates-row">
+                      <span class="absence-dates">01.11.26–02.11.26</span>
+                      <span class="chip">2 dager</span>
+                    </div>
+                  </div>
+                  <div class="absence-item-right">
+                    <span class="status-dot status-dot--success">Aktiv</span>
+                    <button class="absence-kebab" onclick="event.stopPropagation()"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15" r="1.2" fill="currentColor"/></svg></button>
+                  </div>
+                </div>
+
+                <div id="mitt-card-fp" class="absence-item" onclick="selectMittAbsence('mitt-card-fp', 'mitt-detail-fp')">
+                  <div class="absence-item-content">
+                    <div class="absence-meta">
+                      <span class="absence-avatar">IR</span>
+                      <span class="absence-name absence-name--light">Ingrid Reigstad</span>
+                      <span class="absence-sep">·</span>
+                      <span class="absence-type absence-type--light">Foreldrepermisjon</span>
+                    </div>
+                    <div class="absence-dates-row">
+                      <span class="absence-dates">01.09.26–28.02.27</span>
+                      <span class="chip">181 dager</span>
+                    </div>
+                  </div>
+                  <div class="absence-item-right">
+                    <span class="status-dot status-dot--neutral">Fullført</span>
+                    <button class="absence-kebab" onclick="event.stopPropagation()"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15" r="1.2" fill="currentColor"/></svg></button>
+                  </div>
+                </div>
+
+                <div id="mitt-card-omsorg" class="absence-item" onclick="selectMittAbsence('mitt-card-omsorg', 'mitt-detail-omsorg')">
+                  <div class="absence-item-content">
+                    <div class="absence-meta">
+                      <span class="absence-avatar">IR</span>
+                      <span class="absence-name absence-name--light">Ingrid Reigstad</span>
+                      <span class="absence-sep">·</span>
+                      <span class="absence-type absence-type--light">Omsorgsdager</span>
+                    </div>
+                    <div class="absence-dates-row">
+                      <span class="absence-dates">10.11.26–12.11.26</span>
+                      <span class="chip">3 dager</span>
+                    </div>
+                  </div>
+                  <div class="absence-item-right">
+                    <span class="status-dot status-dot--neutral">Fullført</span>
+                    <button class="absence-kebab" onclick="event.stopPropagation()"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15" r="1.2" fill="currentColor"/></svg></button>
+                  </div>
+                </div>
+
+                <div id="mitt-card-ferie2" class="absence-item" onclick="selectMittAbsence('mitt-card-ferie2', 'mitt-detail-ferie2')">
+                  <div class="absence-item-content">
+                    <div class="absence-meta">
+                      <span class="absence-avatar">IR</span>
+                      <span class="absence-name absence-name--light">Ingrid Reigstad</span>
+                      <span class="absence-sep">·</span>
+                      <span class="absence-type absence-type--light">Ferie</span>
+                    </div>
+                    <div class="absence-dates-row">
+                      <span class="absence-dates">18.11.26–21.11.26</span>
+                      <span class="chip">4 dager</span>
+                    </div>
+                  </div>
+                  <div class="absence-item-right">
+                    <span class="status-dot status-dot--neutral">Fullført</span>
+                    <button class="absence-kebab" onclick="event.stopPropagation()"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15" r="1.2" fill="currentColor"/></svg></button>
+                  </div>
+                </div>
+
+                <div id="mitt-card-eg2" class="absence-item" onclick="selectMittAbsence('mitt-card-eg2', 'mitt-detail-eg2')">
+                  <div class="absence-item-content">
+                    <div class="absence-meta">
+                      <span class="absence-avatar">IR</span>
+                      <span class="absence-name absence-name--light">Ingrid Reigstad</span>
+                      <span class="absence-sep">·</span>
+                      <span class="absence-type absence-type--light">Egenmelding</span>
+                    </div>
+                    <div class="absence-dates-row">
+                      <span class="absence-dates">05.10.26–07.10.26</span>
+                      <span class="chip">3 dager</span>
+                    </div>
+                  </div>
+                  <div class="absence-item-right">
+                    <span class="status-dot status-dot--neutral">Fullført</span>
+                    <button class="absence-kebab" onclick="event.stopPropagation()"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15" r="1.2" fill="currentColor"/></svg></button>
+                  </div>
+                </div>
+
+                <div id="mitt-card-eg3" class="absence-item" onclick="selectMittAbsence('mitt-card-eg3', 'mitt-detail-eg3')">
+                  <div class="absence-item-content">
+                    <div class="absence-meta">
+                      <span class="absence-avatar">IR</span>
+                      <span class="absence-name absence-name--light">Ingrid Reigstad</span>
+                      <span class="absence-sep">·</span>
+                      <span class="absence-type absence-type--light">Egenmelding</span>
+                    </div>
+                    <div class="absence-dates-row">
+                      <span class="absence-dates">01.08.26</span>
+                      <span class="chip">1 dag</span>
+                    </div>
+                  </div>
+                  <div class="absence-item-right">
+                    <span class="status-dot status-dot--neutral">Fullført</span>
+                    <button class="absence-kebab" onclick="event.stopPropagation()"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15" r="1.2" fill="currentColor"/></svg></button>
+                  </div>
+                </div>
+
+                <div id="mitt-card-eg4" class="absence-item" onclick="selectMittAbsence('mitt-card-eg4', 'mitt-detail-eg4')">
+                  <div class="absence-item-content">
+                    <div class="absence-meta">
+                      <span class="absence-avatar">IR</span>
+                      <span class="absence-name absence-name--light">Ingrid Reigstad</span>
+                      <span class="absence-sep">·</span>
+                      <span class="absence-type absence-type--light">Egenmelding</span>
+                    </div>
+                    <div class="absence-dates-row">
+                      <span class="absence-dates">15.08.26–17.08.26</span>
+                      <span class="chip">3 dager</span>
+                    </div>
+                  </div>
+                  <div class="absence-item-right">
+                    <span class="status-dot status-dot--neutral">Fullført</span>
+                    <button class="absence-kebab" onclick="event.stopPropagation()"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="5" r="1.2" fill="currentColor"/><circle cx="10" cy="10" r="1.2" fill="currentColor"/><circle cx="10" cy="15" r="1.2" fill="currentColor"/></svg></button>
+                  </div>
+                </div>
+
+              </div><!-- /mitt-split-left -->
+
+              <div class="split-divider"></div>
+
+              <!-- HØYRE: Detaljpanel -->
+              <div class="split-right">
+
+                <!-- Empty state -->
+                <div id="mitt-state-empty" class="empty-state" style="display:flex;">
+                  <svg width="80" height="80" viewBox="0 0 80 80" fill="none">
+                    <path d="M16 12l1.5 3.5L21 17l-3.5 1.5L16 22l-1.5-3.5L11 17l3.5-1.5L16 12z" fill="var(--action-primary-rest)" opacity="0.7"/>
+                    <circle cx="44" cy="44" r="18" fill="var(--surface-info-rest)" stroke="var(--action-primary-rest)" stroke-width="2"/>
+                    <ellipse cx="44" cy="44" rx="30" ry="10" fill="none" stroke="var(--surface-success-active)" stroke-width="2.5" transform="rotate(-20 44 44)"/>
+                    <path d="M32 38 Q44 26 56 38" fill="var(--surface-info-rest)" stroke="none"/>
+                    <path d="M20 52 Q32 62 56 46" fill="none" stroke="var(--surface-error-active)" stroke-width="2" opacity="0.5" stroke-linecap="round"/>
+                  </svg>
+                  <p class="empty-state-title">Ingen valgte</p>
+                  <p class="empty-state-text">Velg et fravær til venstre for å se detaljer.</p>
+                </div>
+
+                <!-- Detail: Egenmelding (aktiv, kvote-advarsel) -->
+                <div id="mitt-detail-egenmelding" style="display:none;">
+                  <div class="detail-header">
+                    <div class="detail-header-meta">
+                      <span>01.11.26–02.11.26</span>
+                      <span class="chip">2 dager</span>
+                      <span class="detail-header-sep">·</span>
+                      <span>Oslokontoret</span>
+                    </div>
+                    <button class="detail-close" onclick="closeMittDetail()" title="Lukk">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <div class="detail-title-row">
+                    <span class="detail-avatar">IR</span>
+                    <span class="detail-title-text">Ingrid Reigstad · Egenmelding</span>
+                  </div>
+                  <div class="detail-content">
+                    <div class="alert alert--warning">
+                      <svg class="alert-icon" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="12" cy="15.5" r="0.75" fill="currentColor"/>
+                      </svg>
+                      <p class="alert-message">Dette er din siste periode fra egenmeldingskvoten. Lederen din kan kreve sykemelding for neste egenmeldingsperiode.</p>
+                    </div>
+                    <div class="detail-section">
+                      <div class="detail-section-header">
+                        <span class="detail-section-title">Detaljer</span>
+                        <button class="detail-section-icon" title="Kommentar">
+                          <svg viewBox="0 0 16 16" fill="none"><path d="M2 2.5h12v8H9.5L7 13V10.5H2V2.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg>
+                        </button>
+                      </div>
+                      <div class="detail-section-body">
+                        <div class="detail-grid">
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Fraværstype</span>
+                            <span class="detail-grid-value">Egenmelding</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Lengde</span>
+                            <span class="detail-grid-value">2 dager</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Periode</span>
+                            <span class="detail-grid-value">01.11.26–02.11.26</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Kommentar</span>
+                            <span class="detail-grid-value">«Influensa disse dagene.»</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label detail-grid-label--with-icon">
+                              Egenmeldingskvote
+                              <span class="tooltip-wrap">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+                                <span class="tooltip">Kvoten inkluderer dette fraværet.</span>
+                              </span>
+                            </span>
+                            <div class="handling-box handling-box--warning">
+                              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+                              <span class="handling-box-text">4/4 perioder og 11/12 dager brukt</span>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div><!-- /mitt-detail-egenmelding -->
+
+                <!-- Detail: Ferie (Til godkjenning) -->
+                <div id="mitt-detail-ferie" style="display:none;">
+                  <div class="detail-header">
+                    <div class="detail-header-meta">
+                      <span>18.11.26–21.11.26</span>
+                      <span class="chip">4 dager</span>
+                      <span class="detail-header-sep">·</span>
+                      <span>Oslokontoret</span>
+                    </div>
+                    <button class="detail-close" onclick="closeMittDetail()" title="Lukk">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <div class="detail-title-row">
+                    <span class="detail-avatar">IR</span>
+                    <span class="detail-title-text">Ingrid Reigstad · Ferie</span>
+                  </div>
+                  <div class="detail-content">
+                    <div class="alert alert--warning">
+                      <svg class="alert-icon" viewBox="0 0 24 24" fill="none">
+                        <circle cx="12" cy="12" r="9.5" stroke="currentColor" stroke-width="1.5"/>
+                        <path d="M12 8v5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                        <circle cx="12" cy="15.5" r="0.75" fill="currentColor"/>
+                      </svg>
+                      <p class="alert-message">Venter på godkjenning fra leder.</p>
+                    </div>
+                    <div class="detail-section">
+                      <div class="detail-section-header">
+                        <span class="detail-section-title">Detaljer</span>
+                      </div>
+                      <div class="detail-section-body">
+                        <div class="detail-grid">
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Fraværstype</span>
+                            <span class="detail-grid-value">Ferie</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Lengde</span>
+                            <span class="detail-grid-value">4 dager</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Periode</span>
+                            <span class="detail-grid-value">18.11.26–21.11.26</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label detail-grid-label--with-icon">
+                              Feriekvote
+                              <span class="tooltip-wrap">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+                                <span class="tooltip">Kvoten inkluderer dette fraværet.</span>
+                              </span>
+                            </span>
+                            <span class="detail-grid-value">5/25 dager brukt</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div><!-- /mitt-detail-ferie -->
+
+                <!-- Detail: Foreldrepermisjon (Fullført) -->
+                <div id="mitt-detail-fp" style="display:none;">
+                  <div class="detail-header">
+                    <div class="detail-header-meta">
+                      <span>01.09.26–28.02.27</span>
+                      <span class="chip">181 dager</span>
+                      <span class="detail-header-sep">·</span>
+                      <span>Oslokontoret</span>
+                    </div>
+                    <button class="detail-close" onclick="closeMittDetail()" title="Lukk">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <div class="detail-title-row">
+                    <span class="detail-avatar">IR</span>
+                    <span class="detail-title-text">Ingrid Reigstad · Foreldrepermisjon</span>
+                  </div>
+                  <div class="detail-content">
+                    <div class="detail-section">
+                      <div class="detail-section-header">
+                        <span class="detail-section-title">Detaljer</span>
+                      </div>
+                      <div class="detail-section-body">
+                        <div class="detail-grid">
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Fraværstype</span>
+                            <span class="detail-grid-value">Foreldrepermisjon</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Lengde</span>
+                            <span class="detail-grid-value">181 dager</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Periode</span>
+                            <span class="detail-grid-value">01.09.26–28.02.27</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Fraværsgrad</span>
+                            <span class="detail-grid-value">100%</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Dekningsgrad</span>
+                            <span class="detail-grid-value">80%</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="detail-section">
+                      <div class="detail-section-header">
+                        <span class="detail-section-title">Forløp <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="color:var(--text-muted)"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.7" fill="currentColor"/></svg></span>
+                      </div>
+                      <div class="detail-section-body">
+                        <div class="forloep-list">
+                          <div class="forloep-item">
+                            <div class="forloep-icon-col">
+                              <span class="forloep-icon forloep-icon--blue-outline"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3.5 3.5 5.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                              <span class="forloep-line"></span>
+                            </div>
+                            <div class="forloep-item-body">
+                              <p class="forloep-step-name forloep-step-name--blue">Foreldrepermisjon</p>
+                              <p class="forloep-step-info">01.09.26–28.02.27</p>
+                            </div>
+                          </div>
+                          <div class="forloep-item">
+                            <div class="forloep-icon-col">
+                              <span class="forloep-icon forloep-icon--blue-outline"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7l3.5 3.5 5.5-6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+                              <span class="forloep-line"></span>
+                            </div>
+                            <div class="forloep-item-body">
+                              <p class="forloep-step-name forloep-step-name--blue">Inntektsmelding sendt til NAV</p>
+                              <p class="forloep-step-info">Arbeidsgiver har sendt inntektsmelding.</p>
+                            </div>
+                          </div>
+                          <div class="forloep-item">
+                            <div class="forloep-icon-col">
+                              <span class="forloep-icon forloep-icon--outline">3</span>
+                            </div>
+                            <div class="forloep-item-body">
+                              <p class="forloep-step-name forloep-step-name--regular">Siste dag for foreldrepenger utbetalt av NAV</p>
+                              <p class="forloep-step-info">28.02.27</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div><!-- /mitt-detail-fp -->
+
+                <!-- Detail: Omsorgsdager (Fullført) -->
+                <div id="mitt-detail-omsorg" style="display:none;">
+                  <div class="detail-header">
+                    <div class="detail-header-meta">
+                      <span>10.11.26–12.11.26</span>
+                      <span class="chip">3 dager</span>
+                      <span class="detail-header-sep">·</span>
+                      <span>Oslokontoret</span>
+                    </div>
+                    <button class="detail-close" onclick="closeMittDetail()" title="Lukk">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <div class="detail-title-row">
+                    <span class="detail-avatar">IR</span>
+                    <span class="detail-title-text">Ingrid Reigstad · Omsorgsdager</span>
+                  </div>
+                  <div class="detail-content">
+                    <div class="detail-section">
+                      <div class="detail-section-header">
+                        <span class="detail-section-title">Detaljer</span>
+                      </div>
+                      <div class="detail-section-body">
+                        <div class="detail-grid">
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Fraværstype</span>
+                            <span class="detail-grid-value">Omsorgsdager</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Lengde</span>
+                            <span class="detail-grid-value">3 dager</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Periode</span>
+                            <span class="detail-grid-value">10.11.26–12.11.26</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Kommentar</span>
+                            <span class="detail-grid-value">«Hjemme med Sofia.»</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label detail-grid-label--with-icon">
+                              Omsorgsdager kvote
+                              <span class="tooltip-wrap">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+                                <span class="tooltip">Kvoten inkluderer dette fraværet.</span>
+                              </span>
+                            </span>
+                            <span class="detail-grid-value">3/10 dager brukt</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div><!-- /mitt-detail-omsorg -->
+
+                <!-- Detail: Ferie 2 (Fullført) -->
+                <div id="mitt-detail-ferie2" style="display:none;">
+                  <div class="detail-header">
+                    <div class="detail-header-meta">
+                      <span>18.11.26–21.11.26</span>
+                      <span class="chip">4 dager</span>
+                      <span class="detail-header-sep">·</span>
+                      <span>Oslokontoret</span>
+                    </div>
+                    <button class="detail-close" onclick="closeMittDetail()" title="Lukk">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <div class="detail-title-row">
+                    <span class="detail-avatar">IR</span>
+                    <span class="detail-title-text">Ingrid Reigstad · Ferie</span>
+                  </div>
+                  <div class="detail-content">
+                    <div class="detail-section">
+                      <div class="detail-section-header">
+                        <span class="detail-section-title">Detaljer</span>
+                      </div>
+                      <div class="detail-section-body">
+                        <div class="detail-grid">
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Fraværstype</span>
+                            <span class="detail-grid-value">Ferie</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Lengde</span>
+                            <span class="detail-grid-value">4 dager</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Periode</span>
+                            <span class="detail-grid-value">18.11.26–21.11.26</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label detail-grid-label--with-icon">
+                              Feriekvote
+                              <span class="tooltip-wrap">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+                                <span class="tooltip">Kvoten inkluderer dette fraværet.</span>
+                              </span>
+                            </span>
+                            <span class="detail-grid-value">9/25 dager brukt</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div><!-- /mitt-detail-ferie2 -->
+
+                <!-- Detail: Egenmelding eg2 (Fullført, 05.10.26) -->
+                <div id="mitt-detail-eg2" style="display:none;">
+                  <div class="detail-header">
+                    <div class="detail-header-meta">
+                      <span>05.10.26–07.10.26</span>
+                      <span class="chip">3 dager</span>
+                      <span class="detail-header-sep">·</span>
+                      <span>Oslokontoret</span>
+                    </div>
+                    <button class="detail-close" onclick="closeMittDetail()" title="Lukk">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <div class="detail-title-row">
+                    <span class="detail-avatar">IR</span>
+                    <span class="detail-title-text">Ingrid Reigstad · Egenmelding</span>
+                  </div>
+                  <div class="detail-content">
+                    <div class="detail-section">
+                      <div class="detail-section-header">
+                        <span class="detail-section-title">Detaljer</span>
+                      </div>
+                      <div class="detail-section-body">
+                        <div class="detail-grid">
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Fraværstype</span>
+                            <span class="detail-grid-value">Egenmelding</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Lengde</span>
+                            <span class="detail-grid-value">3 dager</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Periode</span>
+                            <span class="detail-grid-value">05.10.26–07.10.26</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Kommentar</span>
+                            <span class="detail-grid-value">–</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label detail-grid-label--with-icon">
+                              Egenmeldingskvote
+                              <span class="tooltip-wrap">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+                                <span class="tooltip">Kvoten inkluderer dette fraværet.</span>
+                              </span>
+                            </span>
+                            <span class="detail-grid-value">6/12 dager, 2/4 perioder</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div><!-- /mitt-detail-eg2 -->
+
+                <!-- Detail: Egenmelding eg3 (Fullført, 01.08.26) -->
+                <div id="mitt-detail-eg3" style="display:none;">
+                  <div class="detail-header">
+                    <div class="detail-header-meta">
+                      <span>01.08.26</span>
+                      <span class="chip">1 dag</span>
+                      <span class="detail-header-sep">·</span>
+                      <span>Oslokontoret</span>
+                    </div>
+                    <button class="detail-close" onclick="closeMittDetail()" title="Lukk">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <div class="detail-title-row">
+                    <span class="detail-avatar">IR</span>
+                    <span class="detail-title-text">Ingrid Reigstad · Egenmelding</span>
+                  </div>
+                  <div class="detail-content">
+                    <div class="detail-section">
+                      <div class="detail-section-header">
+                        <span class="detail-section-title">Detaljer</span>
+                      </div>
+                      <div class="detail-section-body">
+                        <div class="detail-grid">
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Fraværstype</span>
+                            <span class="detail-grid-value">Egenmelding</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Lengde</span>
+                            <span class="detail-grid-value">1 dag</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Periode</span>
+                            <span class="detail-grid-value">01.08.26</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Kommentar</span>
+                            <span class="detail-grid-value">–</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label detail-grid-label--with-icon">
+                              Egenmeldingskvote
+                              <span class="tooltip-wrap">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+                                <span class="tooltip">Kvoten inkluderer dette fraværet.</span>
+                              </span>
+                            </span>
+                            <span class="detail-grid-value">1/12 dager, 1/4 perioder</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div><!-- /mitt-detail-eg3 -->
+
+                <!-- Detail: Egenmelding eg4 (Fullført, 15.08.26) -->
+                <div id="mitt-detail-eg4" style="display:none;">
+                  <div class="detail-header">
+                    <div class="detail-header-meta">
+                      <span>15.08.26–17.08.26</span>
+                      <span class="chip">3 dager</span>
+                      <span class="detail-header-sep">·</span>
+                      <span>Oslokontoret</span>
+                    </div>
+                    <button class="detail-close" onclick="closeMittDetail()" title="Lukk">
+                      <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+                    </button>
+                  </div>
+                  <div class="detail-title-row">
+                    <span class="detail-avatar">IR</span>
+                    <span class="detail-title-text">Ingrid Reigstad · Egenmelding</span>
+                  </div>
+                  <div class="detail-content">
+                    <div class="detail-section">
+                      <div class="detail-section-header">
+                        <span class="detail-section-title">Detaljer</span>
+                      </div>
+                      <div class="detail-section-body">
+                        <div class="detail-grid">
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Fraværstype</span>
+                            <span class="detail-grid-value">Egenmelding</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Lengde</span>
+                            <span class="detail-grid-value">3 dager</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Periode</span>
+                            <span class="detail-grid-value">15.08.26–17.08.26</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label">Kommentar</span>
+                            <span class="detail-grid-value">–</span>
+                          </div>
+                          <div class="detail-grid-item">
+                            <span class="detail-grid-label detail-grid-label--with-icon">
+                              Egenmeldingskvote
+                              <span class="tooltip-wrap">
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+                                <span class="tooltip">Kvoten inkluderer dette fraværet.</span>
+                              </span>
+                            </span>
+                            <span class="detail-grid-value">4/12 dager, 2/4 perioder</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div><!-- /mitt-detail-eg4 -->
+
+              </div><!-- /split-right -->
+
+            </div><!-- /split-body -->
+
+          </div><!-- /content-card -->
+
+        </div><!-- /tab-mitt -->
 
       </div>
     </main>
@@ -2041,7 +2873,279 @@
   </div>
 </div>
 
+<!-- MODAL: Nytt fravær (Ansattes fravær – leder) -->
+<div class="modal-overlay" id="modal-nytt-fravaer-leder" style="display:none;" onclick="if(event.target===this)closeNyttFravaerLeder()">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Nytt fravær</span>
+      <button class="modal-close" onclick="closeNyttFravaerLeder()" title="Lukk">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-group" style="margin:0;">
+        <label class="input-label">Velg fraværstype <span class="required">*</span></label>
+        <select class="input" id="leder-modal-fravartype">
+          <option value="" disabled selected>Fraværstype</option>
+          <option value="egenmelding">Egenmelding</option>
+          <option value="omsorgsdager">Omsorgsdager</option>
+          <option value="ferie">Ferie</option>
+          <option value="ulonnet">Ulønnet permisjon</option>
+          <option value="velferd">Velferdspermisjon</option>
+          <option value="permittering">Permittering</option>
+        </select>
+      </div>
+
+      <div class="form-group" style="margin:0;">
+        <label class="input-label" id="leder-ansatt-label">Velg ansatt <span class="required">*</span></label>
+        <select class="input" id="leder-modal-ansatt">
+          <option value="" disabled selected>Ansatt</option>
+          <option value="jakob">Jakob Pettersen</option>
+          <option value="lars">Lars Eriksen</option>
+          <option value="erik">Erik Dahl</option>
+          <option value="ingrid">Ingrid Reigstad</option>
+          <option value="sofia">Sofia Berg</option>
+          <option value="thomas">Thomas Lie</option>
+          <option value="martin">Martin Johansen</option>
+          <option value="kari">Kari Laurstad</option>
+        </select>
+      </div>
+
+      <!-- Standard-felter (alle typer unntatt Permittering) -->
+      <div id="leder-default-fields">
+        <div class="modal-date-row">
+          <div class="form-group">
+            <label class="input-label">Startdato <span class="required">*</span></label>
+            <div class="input-date-wrap">
+              <input class="input" type="text" placeholder="YYYY-MM-DD">
+              <span class="input-date-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3M11 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2 7h12" stroke="currentColor" stroke-width="1.3"/></svg>
+              </span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="input-label">Sluttdato</label>
+            <div class="input-date-wrap">
+              <input class="input" type="text" placeholder="YYYY-MM-DD">
+              <span class="input-date-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3M11 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2 7h12" stroke="currentColor" stroke-width="1.3"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:var(--space-8); margin-top:var(--space-20);">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:2px; color:var(--text-muted);"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+          <p style="font:14px/1.4 'Rubik',sans-serif; color:var(--text-primary);">Ved innsendt skjema registreres fraværet og din ansatt får beskjed. Timelisten vil bli oppdatert automatisk.</p>
+        </div>
+      </div>
+
+      <!-- Permittering-felter -->
+      <div id="leder-permittering-fields" style="display:none; flex-direction:column; gap:var(--space-20);">
+        <div class="form-group" style="margin:0;">
+          <label class="input-label">Varslingsdato <span class="required">*</span></label>
+          <div class="input-date-wrap">
+            <input class="input" type="text" placeholder="YYYY-MM-DD">
+            <span class="input-date-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3M11 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2 7h12" stroke="currentColor" stroke-width="1.3"/></svg>
+            </span>
+          </div>
+        </div>
+        <div class="modal-date-row">
+          <div class="form-group">
+            <label class="input-label">Startdato <span class="required">*</span></label>
+            <div class="input-date-wrap">
+              <input class="input" type="text" placeholder="YYYY-MM-DD">
+              <span class="input-date-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3M11 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2 7h12" stroke="currentColor" stroke-width="1.3"/></svg>
+              </span>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="input-label">Sluttdato</label>
+            <div class="input-date-wrap">
+              <input class="input" type="text" placeholder="YYYY-MM-DD">
+              <span class="input-date-icon">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3M11 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2 7h12" stroke="currentColor" stroke-width="1.3"/></svg>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="input-label">Fraværsprosent <span class="required">*</span></label>
+          <input class="input" type="text" placeholder="50%">
+        </div>
+        <div class="form-group" style="margin:0;">
+          <label class="input-label">Årsak til permittering</label>
+          <select class="input">
+            <option value="" disabled selected>Årsak</option>
+            <option>Mangel på arbeid</option>
+            <option>Teknisk stans</option>
+            <option>Naturkatastrofe</option>
+            <option>Annet</option>
+          </select>
+        </div>
+        <div style="display:flex; align-items:center; gap:var(--space-8);">
+          <input type="checkbox" id="leder-nav-checkbox" style="width:16px; height:16px; flex-shrink:0; accent-color:var(--action-primary-rest); cursor:pointer;">
+          <label for="leder-nav-checkbox" style="font:14px/1.4 'Rubik',sans-serif; color:var(--text-primary); cursor:pointer; display:flex; align-items:center; gap:var(--space-4);">
+            Meld fra til NAV om permitteringen
+            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" style="color:var(--text-muted); flex-shrink:0;"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+          </label>
+        </div>
+        <div style="display:flex; align-items:flex-start; gap:var(--space-8);">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:2px; color:var(--text-muted);"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+          <p style="font:14px/1.4 'Rubik',sans-serif; color:var(--text-primary);">Ved innsendt skjema registreres fraværet og din ansatt får beskjed. Timelisten vil bli oppdatert automatisk.</p>
+        </div>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeNyttFravaerLeder()">Registrer fravær</button>
+      <button class="btn btn-secondary" onclick="closeNyttFravaerLeder()">Avbryt</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL: Nytt fravær (Mitt fravær) -->
+<div class="modal-overlay" id="modal-nytt-fravaer" style="display:none;" onclick="closeModalOnOverlay(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Nytt fravær</span>
+      <button class="modal-close" onclick="closeNyttFravaer()" title="Lukk">
+        <svg viewBox="0 0 16 16" fill="none"><path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+
+      <div class="form-group" style="margin:0;">
+        <label class="input-label">Velg fraværstype <span class="required">*</span></label>
+        <select class="input" id="modal-fravartype">
+          <option value="" disabled selected>Fraværstype</option>
+          <option value="egenmelding">Egenmelding</option>
+          <option value="omsorgsdager">Omsorgsdager</option>
+          <option value="ferie">Ferie</option>
+          <option value="ulonnet">Ulønnet permisjon</option>
+          <option value="velferd">Velferdspermisjon</option>
+        </select>
+      </div>
+
+      <div class="modal-date-row">
+        <div class="form-group">
+          <label class="input-label">Startdato <span class="required">*</span></label>
+          <div class="input-date-wrap">
+            <input class="input" type="text" placeholder="YYYY-MM-DD">
+            <span class="input-date-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3M11 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2 7h12" stroke="currentColor" stroke-width="1.3"/></svg>
+            </span>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="input-label">Sluttdato</label>
+          <div class="input-date-wrap">
+            <input class="input" type="text" placeholder="YYYY-MM-DD">
+            <span class="input-date-icon">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3.5" width="12" height="11" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 2v3M11 2v3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M2 7h12" stroke="currentColor" stroke-width="1.3"/></svg>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group" style="margin:0;">
+        <label class="input-label">Kommentar til leder</label>
+        <textarea class="input" rows="3" placeholder="Din kommentar"></textarea>
+        <span class="input-hint">Unngå å dele sensitive personopplysninger som diagnoser, symptomer og/eller behandling.</span>
+      </div>
+
+      <div style="display:flex; align-items:flex-start; gap:var(--space-8);">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" style="flex-shrink:0; margin-top:2px; color:var(--text-muted);"><circle cx="8" cy="8" r="6.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7v4.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><circle cx="8" cy="5" r="0.75" fill="currentColor"/></svg>
+        <p style="font:14px/1.4 'Rubik',sans-serif; color:var(--text-primary);">Ved innsendt skjema registreres fraværet og din leder får beskjed. Timelisten vil bli oppdatert automatisk.</p>
+      </div>
+
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeNyttFravaer()">Send inn</button>
+      <button class="btn btn-secondary" onclick="closeNyttFravaer()">Avbryt</button>
+    </div>
+  </div>
+</div>
+
 <script>
+  function switchTab(tab) {
+    document.getElementById('tab-btn-ansatte').classList.toggle('tx-tab--active', tab === 'ansatte');
+    document.getElementById('tab-btn-mitt').classList.toggle('tx-tab--active', tab === 'mitt');
+    document.getElementById('tab-ansatte').style.display = tab === 'ansatte' ? 'contents' : 'none';
+    document.getElementById('tab-mitt').style.display = tab === 'mitt' ? 'contents' : 'none';
+  }
+
+  var mittDetailIds = ['mitt-state-empty', 'mitt-detail-egenmelding', 'mitt-detail-ferie', 'mitt-detail-fp', 'mitt-detail-omsorg', 'mitt-detail-ferie2', 'mitt-detail-eg2', 'mitt-detail-eg3', 'mitt-detail-eg4'];
+
+  function selectMittAbsence(cardId, detailId) {
+    document.querySelectorAll('#mitt-split-left .absence-item').forEach(function(el) {
+      el.classList.remove('absence-item--selected');
+    });
+    document.getElementById(cardId).classList.add('absence-item--selected');
+    mittDetailIds.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    if (detailId) {
+      var el = document.getElementById(detailId);
+      if (el) el.style.display = 'block';
+    } else {
+      document.getElementById('mitt-state-empty').style.display = 'flex';
+    }
+  }
+
+  function closeMittDetail() {
+    document.querySelectorAll('#mitt-split-left .absence-item').forEach(function(el) {
+      el.classList.remove('absence-item--selected');
+    });
+    mittDetailIds.forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) el.style.display = 'none';
+    });
+    document.getElementById('mitt-state-empty').style.display = 'flex';
+  }
+
+  function openNyttFravaer() {
+    var ansatteTab = document.getElementById('tab-btn-ansatte');
+    if (ansatteTab && ansatteTab.classList.contains('tx-tab--active')) {
+      document.getElementById('modal-nytt-fravaer-leder').style.display = 'flex';
+      document.getElementById('leder-modal-fravartype').value = '';
+      document.getElementById('leder-modal-ansatt').value = '';
+      document.getElementById('leder-default-fields').style.display = 'block';
+      document.getElementById('leder-permittering-fields').style.display = 'none';
+      document.getElementById('leder-ansatt-label').innerHTML = 'Velg ansatt <span class="required">*</span>';
+    } else {
+      document.getElementById('modal-nytt-fravaer').style.display = 'flex';
+      document.getElementById('modal-fravartype').value = '';
+    }
+  }
+
+  function closeNyttFravaerLeder() {
+    document.getElementById('modal-nytt-fravaer-leder').style.display = 'none';
+  }
+
+  document.getElementById('leder-modal-fravartype').addEventListener('change', function() {
+    var isPermittering = this.value === 'permittering';
+    document.getElementById('leder-default-fields').style.display = isPermittering ? 'none' : 'block';
+    document.getElementById('leder-permittering-fields').style.display = isPermittering ? 'flex' : 'none';
+    var label = document.getElementById('leder-ansatt-label');
+    label.innerHTML = isPermittering
+      ? 'Velg ansatt(e) <span class="required">*</span>'
+      : 'Velg ansatt <span class="required">*</span>';
+  });
+
+  function closeNyttFravaer() {
+    document.getElementById('modal-nytt-fravaer').style.display = 'none';
+  }
+
+  function closeModalOnOverlay(e) {
+    if (e.target === document.getElementById('modal-nytt-fravaer')) {
+      closeNyttFravaer();
+    }
+  }
+
   function markSeenAndDeselect() {
     document.querySelectorAll('.absence-item--selected').forEach(function(el) {
       if (el.classList.contains('absence-item--new')) {
