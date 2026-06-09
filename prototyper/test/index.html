@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merverdiavgift – Tripletex</title>
+  <link rel="stylesheet" href="../../_system/tokens.css">
+  <link rel="stylesheet" href="../../_system/components.css">
+  <link rel="stylesheet" href="../../_system/layout.css">
+  <link rel="stylesheet" href="https://cdn.tripletex.no/google-fonts/rubik-400-500-800.css">
+  <style>
+    /* Kompakt sidebar (icon-only) som i Figma-designet */
+    .sidebar-compact {
+      width: 64px;
+      flex-shrink: 0;
+      background: var(--surface-background);
+      border-right: 1px solid var(--border-faint);
+      overflow: hidden;
+      padding: var(--space-4) 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .sidebar-compact .nav-icon-item {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: var(--radius-default);
+      color: var(--text-muted);
+      cursor: pointer;
+      margin: 1px 0;
+      text-decoration: none;
+    }
+    .sidebar-compact .nav-icon-item:hover {
+      background: var(--surface-disabled);
+      color: var(--text-primary);
+    }
+    .sidebar-compact .nav-icon-item--active {
+      background: var(--action-primary-rest);
+      color: var(--text-on-action);
+    }
+    .sidebar-compact .nav-icon-item svg {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* Toppfaner */
+    .page-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-muted);
+      margin-bottom: var(--space-24);
+      gap: 0;
+    }
+    .page-tab {
+      height: 40px;
+      padding: 0 var(--space-16);
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      font: 14px/1.4 "Rubik", sans-serif;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      margin-bottom: -1px;
+    }
+    .page-tab--active {
+      color: var(--text-primary);
+      border-bottom-color: var(--action-primary-rest);
+      font-weight: 500;
+    }
+    .page-tab:hover:not(.page-tab--active) {
+      color: var(--text-primary);
+      background: var(--surface-disabled);
+    }
+
+    /* Statuskort-rad */
+    .stat-card-row {
+      display: flex;
+      gap: var(--space-16);
+    }
+    .stat-card {
+      background: var(--surface-default);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-default);
+      padding: var(--space-24);
+      width: 350px;
+      flex-shrink: 0;
+    }
+    .stat-card-label {
+      font: 14px/1.5 "Rubik", sans-serif;
+      color: var(--text-muted);
+      margin-bottom: var(--space-12);
+    }
+    .stat-card-value {
+      font: 500 24px/1.2 "Rubik", sans-serif;
+      color: var(--text-primary);
+      margin-bottom: var(--space-8);
+    }
+    .stat-card-meta {
+      display: flex;
+      align-items: center;
+      gap: var(--space-12);
+      font: 13px/1.4 "Rubik", sans-serif;
+      color: var(--text-muted);
+    }
+    .stat-card-toggle {
+      display: flex;
+      align-items: center;
+      gap: var(--space-8);
+    }
+    .toggle-track {
+      width: 32px;
+      height: 18px;
+      background: var(--action-primary-rest);
+      border-radius: var(--radius-full);
+      position: relative;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .toggle-thumb {
+      width: 14px;
+      height: 14px;
+      background: var(--text-on-action);
+      border-radius: var(--radius-full);
+      position: absolute;
+      top: 2px;
+      right: 2px;
+      transition: right 0.1s;
+    }
+
+    /* Widget-kort (termintabell-container) */
+    .widget-card {
+      background: var(--surface-default);
+      border: 1px solid var(--border-muted);
+      border-radius: var(--radius-default);
+      overflow: hidden;
+    }
+    .widget-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: var(--space-16) var(--space-24);
+      border-bottom: 1px solid var(--border-muted);
+    }
+    .widget-header-left {
+      display: flex;
+      align-items: center;
+      gap: var(--space-12);
+    }
+    .widget-title {
+      font: 500 16px/1.3 "Rubik", sans-serif;
+      color: var(--text-primary);
+    }
+    .widget-header-right {
+      display: flex;
+      align-items: center;
+      gap: var(--space-8);
+    }
+
+    /* Periode-tabs (understreks-stil) */
+    .period-tabs {
+      display: flex;
+      align-items: flex-end;
+      gap: 0;
+      padding: 0 var(--space-24);
+      border-bottom: 1px solid var(--border-muted);
+      background: var(--surface-default);
+    }
+    .period-tab {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      height: 28px;
+      padding: 0 var(--space-4);
+      margin-right: var(--space-16);
+      background: none;
+      border: none;
+      border-bottom: 4px solid transparent;
+      font: 14px/1 "Rubik", sans-serif;
+      color: var(--text-muted);
+      cursor: pointer;
+      white-space: nowrap;
+      margin-bottom: -1px;
+    }
+    .period-tab--active {
+      color: var(--text-primary);
+      border-bottom-color: var(--action-primary-rest);
+      font-weight: 500;
+    }
+    .period-tab:hover:not(.period-tab--active) {
+      color: var(--text-primary);
+    }
+    .period-tab-status {
+      width: 8px;
+      height: 8px;
+      border-radius: var(--radius-full);
+      flex-shrink: 0;
+    }
+    .period-tab-status--warning { background: var(--surface-warning-active); }
+    .period-tab-status--neutral  { background: var(--border-secondary); }
+
+    /* Seksjonstekst over tabell */
+    .section-label {
+      font: 500 14px/1.4 "Rubik", sans-serif;
+      color: var(--text-primary);
+      padding: var(--space-16) var(--space-24) 0;
+    }
+
+    /* Kompakt select i toolbar */
+    .select-compact {
+      height: var(--size-large);
+      padding: 0 var(--space-32) 0 var(--space-12);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-default);
+      background: var(--surface-background);
+      font: 14px/1.5 "Rubik", sans-serif;
+      color: var(--text-primary);
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' viewBox='0 0 20 20' fill='none'%3E%3Cpath d='M5 7.5l5 5 5-5' stroke='%23818794' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right var(--space-8) center;
+      cursor: pointer;
+    }
+    .select-compact:focus {
+      border-color: var(--border-focus);
+      outline: none;
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- TOPBAR -->
+  <header class="app-topbar">
+    <div class="topbar-left">
+      <button class="topbar-icon-btn" title="Meny">
+        <svg viewBox="0 0 16 16" fill="none"><rect y="2.5" width="16" height="1.5" rx="0.75" fill="currentColor"/><rect y="7" width="16" height="1.5" rx="0.75" fill="currentColor"/><rect y="11.5" width="16" height="1.5" rx="0.75" fill="currentColor"/></svg>
+      </button>
+      <span class="topbar-logo">tripletex</span>
+      <span class="topbar-sep"></span>
+      <div class="topbar-company">
+        <span class="topbar-company-badge">T</span>
+        <span class="topbar-company-name">Tripletex AS</span>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-search">
+        <svg viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.3"/><path d="M9.5 9.5L12.5 12.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Søk
+      </div>
+      <button class="topbar-assistant">Assistent ✦</button>
+      <button class="topbar-icon-btn" title="Favoritter"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1.5 3.5 3.7.5-2.7 2.6.6 3.7L8 10.5l-3.1 1.8.6-3.7L3 5.5l3.7-.5L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button>
+      <button class="topbar-icon-btn" title="Last ned"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2.5v7M5.5 7l2.5 3 2.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 12.5h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+      <button class="topbar-icon-btn" title="Varsler"><svg viewBox="0 0 16 16" fill="none"><path d="M8 1.5A4.5 4.5 0 003.5 6v3L2 11h12l-1.5-2V6A4.5 4.5 0 008 1.5z" stroke="currentColor" stroke-width="1.3"/><path d="M6.5 11.5a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.3"/></svg></button>
+      <button class="topbar-icon-btn" title="Meldinger"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="8.5" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 13.5l1.5-2h4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button class="topbar-icon-btn" title="Hjelp"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 11v.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M6 6.5a2 2 0 114 0c0 1.5-2 1.5-2 2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+      <button class="topbar-icon-btn" title="Kunngjøringer"><svg viewBox="0 0 16 16" fill="none"><path d="M8 2l1 3H13l-2.5 2 1 3L8 8.5 4.5 10l1-3L3 5h4L8 2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></button>
+      <button class="topbar-icon-btn" title="Rapporter"><svg viewBox="0 0 16 16" fill="none"><path d="M4 2h5.5L13 5.5V14H3V2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M9 2v4h4M6 9h4M6 11.5h2.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></button>
+      <button class="topbar-user-btn" title="Bruker"><svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="4.5" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M2 13c0-2.8 2.2-5 5-5s5 2.2 5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg></button>
+    </div>
+  </header>
+
+  <div class="app-body">
+
+    <!-- SIDEBAR (kompakt, icon-only) -->
+    <nav class="sidebar-compact">
+      <a class="nav-icon-item" title="Hjem"><svg viewBox="0 0 16 16" fill="none"><path d="M2 7.5l6-5 6 5V14H10.5v-4h-5v4H2V7.5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></a>
+      <a class="nav-icon-item" title="Timeliste"><svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3l2 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+      <a class="nav-icon-item" title="Faktura"><svg viewBox="0 0 16 16" fill="none"><path d="M3 2h10v13l-2-1.5-2 1.5-2-1.5-2 1.5-2-1.5V2z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M5.5 7h5M5.5 9.5h5M5.5 5h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></a>
+      <a class="nav-icon-item" title="Bilag"><svg viewBox="0 0 16 16" fill="none"><path d="M4 2h8l2 2v10a1 1 0 01-1 1H3a1 1 0 01-1-1V3a1 1 0 011-1z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/><path d="M10 2v3H5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg></a>
+      <a class="nav-icon-item" title="Bank"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="7" width="12" height="7" rx="1" stroke="currentColor" stroke-width="1.3"/><path d="M4 7V5M8 7V5M12 7V5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/><path d="M1.5 5h13l-6.5-3L1.5 5z" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round"/></svg></a>
+      <a class="nav-icon-item nav-icon-item--active" title="Regnskap"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="2" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="2" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/><rect x="9" y="9" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3"/></svg></a>
+      <a class="nav-icon-item" title="Rapporter"><svg viewBox="0 0 16 16" fill="none"><path d="M3 12V8M7 12V5M11 12V7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
+      <a class="nav-icon-item" title="Lønn"><svg viewBox="0 0 16 16" fill="none"><rect x="2" y="4.5" width="12" height="7.5" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.5v1M6.5 8.5h3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></a>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <div class="page">
+
+        <!-- SIDEHODE -->
+        <div class="page-header">
+          <h1 class="page-title">Merverdiavgift</h1>
+          <div class="page-actions">
+            <button class="btn btn-secondary">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5.5 7l2.5 3 2.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Last ned
+            </button>
+            <button class="btn btn-primary">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              Ny deklarasjon
+            </button>
+          </div>
+        </div>
+
+        <!-- TOPPFANER -->
+        <div class="page-tabs">
+          <button class="page-tab page-tab--active">Terminer</button>
+          <button class="page-tab">Transaksjoner</button>
+          <button class="page-tab">Betalingsoversikt</button>
+        </div>
+
+        <!-- STATUSKORT-RAD -->
+        <div class="stat-card-row">
+
+          <!-- Kontrollstatus -->
+          <div class="stat-card">
+            <div class="stat-card-label">Kontrollstatus</div>
+            <div class="stat-card-meta">
+              <div class="stat-card-toggle">
+                <div class="toggle-track"><div class="toggle-thumb"></div></div>
+                <span>Automatisk kontroll</span>
+              </div>
+              <span class="text-action" style="cursor:pointer; font-size:13px;">Logg</span>
+            </div>
+            <div style="margin-top: var(--space-12);">
+              <span class="status-dot status-dot--success">Ingen avvik funnet</span>
+            </div>
+          </div>
+
+          <!-- Avvik og differanser -->
+          <div class="stat-card">
+            <div class="stat-card-label">Avvik og differanser</div>
+            <div style="display:flex; gap: var(--space-24); margin-top: var(--space-8);">
+              <div>
+                <div style="font: 500 22px/1 'Rubik', sans-serif; color: var(--text-primary);">0</div>
+                <div style="font: 13px/1.4 'Rubik', sans-serif; color: var(--text-muted); margin-top: var(--space-4);">Avvik</div>
+              </div>
+              <div>
+                <div style="font: 500 22px/1 'Rubik', sans-serif; color: var(--text-primary);">0,00</div>
+                <div style="font: 13px/1.4 'Rubik', sans-serif; color: var(--text-muted); margin-top: var(--space-4);">Differanse (NOK)</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- TERMINTABELL WIDGET -->
+        <div class="widget-card">
+
+          <!-- Widget-header -->
+          <div class="widget-header">
+            <div class="widget-header-left">
+              <span class="widget-title">Termin</span>
+              <select class="select-compact" style="width:160px;">
+                <option selected>2025</option>
+                <option>2024</option>
+                <option>2023</option>
+              </select>
+              <select class="select-compact" style="width:175px;">
+                <option selected>Alminnelig næring</option>
+                <option>Primærnæring</option>
+                <option>Fisk og andre marine ressurser</option>
+              </select>
+            </div>
+            <div class="widget-header-right">
+              <button class="btn btn-secondary">Meld inn skattemelding</button>
+              <button class="btn btn-primary">
+                <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+                Betal merverdiavgift
+              </button>
+              <button class="icon-btn" title="Eksporter">
+                <svg viewBox="0 0 16 16" fill="none"><path d="M8 2v8M5.5 7l2.5 3 2.5-3" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 13h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Periode-tabs -->
+          <div class="period-tabs">
+            <button class="period-tab period-tab--active">Mars – April</button>
+            <button class="period-tab">
+              <span class="period-tab-status period-tab-status--warning"></span>
+              Mai – Juni
+            </button>
+            <button class="period-tab">
+              <span class="period-tab-status period-tab-status--neutral"></span>
+              Juli – August
+            </button>
+            <button class="period-tab">
+              <span class="period-tab-status period-tab-status--neutral"></span>
+              September – Oktober
+            </button>
+            <button class="period-tab">
+              <span class="period-tab-status period-tab-status--neutral"></span>
+              November – Desember
+            </button>
+          </div>
+
+          <!-- Tabell-toolbar -->
+          <div class="table-toolbar">
+            <div class="table-toolbar-filters">
+              <div class="input-search-wrap">
+                <input class="input" type="search" placeholder="Søk...">
+                <svg class="input-search-icon" viewBox="0 0 20 20" fill="none"><circle cx="9" cy="9" r="5.5" stroke="currentColor" stroke-width="1.5"/><path d="M13.5 13.5L17 17" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              </div>
+              <div class="switcher">
+                <button class="switcher-btn switcher-btn--active">Alle</button>
+                <button class="switcher-btn">Utgående</button>
+              </div>
+            </div>
+            <div class="table-toolbar-actions">
+              <button class="icon-btn" title="Kolonneinnstillinger">
+                <svg viewBox="0 0 20 20" fill="none"><path d="M3 5h14M3 10h14M3 15h14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+              </button>
+            </div>
+          </div>
+
+          <!-- Termintabell -->
+          <table class="tx-table table-standard">
+            <thead>
+              <tr>
+                <th style="width:28px;"></th>
+                <th>MVA-kode</th>
+                <th class="col-num">Grunnlag</th>
+                <th class="col-num">Utgående MVA</th>
+                <th class="col-num">Inngående MVA</th>
+                <th class="col-num">Grunnlag (import)</th>
+                <th class="col-num">MVA (import)</th>
+                <th class="col-num">Netto MVA</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="status-dot status-dot--success" style="gap:0;"></span></td>
+                <td><span class="td-name">3 – Utgående MVA 25%</span></td>
+                <td class="col-num">478 734,76</td>
+                <td class="col-num">119 683,69</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">119 683,69</td>
+              </tr>
+              <tr>
+                <td><span class="status-dot status-dot--success" style="gap:0;"></span></td>
+                <td><span class="td-name">31 – Utgående MVA 15%</span></td>
+                <td class="col-num">92 400,00</td>
+                <td class="col-num">13 860,00</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">13 860,00</td>
+              </tr>
+              <tr>
+                <td><span class="status-dot status-dot--neutral" style="gap:0;"></span></td>
+                <td><span class="td-name">33 – Utgående MVA 12%</span></td>
+                <td class="col-num">0,00</td>
+                <td class="col-num">0,00</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">0,00</td>
+              </tr>
+              <tr>
+                <td><span class="status-dot status-dot--success" style="gap:0;"></span></td>
+                <td><span class="td-name">40 – Inngående MVA 25%</span></td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">-62 340,50</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">-62 340,50</td>
+              </tr>
+              <tr>
+                <td><span class="status-dot status-dot--success" style="gap:0;"></span></td>
+                <td><span class="td-name">41 – Inngående MVA 15%</span></td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">-8 120,00</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">-8 120,00</td>
+              </tr>
+              <tr>
+                <td><span class="status-dot status-dot--neutral" style="gap:0;"></span></td>
+                <td><span class="td-name">81 – Import av varer 25%</span></td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">0,00</td>
+                <td class="col-num">0,00</td>
+                <td class="col-num">0,00</td>
+              </tr>
+              <tr>
+                <td><span class="status-dot status-dot--neutral" style="gap:0;"></span></td>
+                <td><span class="td-name">83 – Import av varer 12%</span></td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">0,00</td>
+                <td class="col-num">0,00</td>
+                <td class="col-num">0,00</td>
+              </tr>
+              <tr style="background: var(--surface-info-rest); font-weight:500;">
+                <td></td>
+                <td style="font-weight:500;">Sum</td>
+                <td class="col-num" style="font-weight:500;">571 134,76</td>
+                <td class="col-num" style="font-weight:500;">133 543,69</td>
+                <td class="col-num" style="font-weight:500;">-70 460,50</td>
+                <td class="col-num" style="font-weight:500;">0,00</td>
+                <td class="col-num" style="font-weight:500;">0,00</td>
+                <td class="col-num" style="font-weight:500;">63 083,19</td>
+              </tr>
+            </tbody>
+          </table>
+
+        </div>
+
+        <!-- BETALT MERVERDIAVGIFT HITTIL I ÅR -->
+        <div class="widget-card">
+          <div class="section-label" style="padding: var(--space-24) var(--space-24) 0;">Betalt merverdiavgift hittil i år</div>
+          <table class="tx-table table-standard" style="margin-top: var(--space-12);">
+            <thead>
+              <tr>
+                <th>Termin</th>
+                <th class="col-num">Hovedbok</th>
+                <th class="col-num">Rapportert</th>
+                <th class="col-num">Betalt</th>
+                <th>Betalingsdato</th>
+                <th class="col-num">Rest til betaling</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Januar – Februar 2025</td>
+                <td class="col-num">48 230,00</td>
+                <td class="col-num">48 230,00</td>
+                <td class="col-num">48 230,00</td>
+                <td class="col-muted">10.04.2025</td>
+                <td class="col-num"><span class="status-dot status-dot--success">0,00</span></td>
+              </tr>
+              <tr>
+                <td>Mars – April 2025</td>
+                <td class="col-num">63 083,19</td>
+                <td class="col-num">63 083,19</td>
+                <td class="col-num">63 083,19</td>
+                <td class="col-muted">10.06.2025</td>
+                <td class="col-num"><span class="status-dot status-dot--success">0,00</span></td>
+              </tr>
+              <tr>
+                <td>Mai – Juni 2025</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-muted">Frist: 10.08.2025</td>
+                <td class="col-num"><span class="status-dot status-dot--warning">Ikke innlevert</span></td>
+              </tr>
+              <tr>
+                <td>Juli – August 2025</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-muted">Frist: 10.10.2025</td>
+                <td class="col-num col-muted">—</td>
+              </tr>
+              <tr>
+                <td>September – Oktober 2025</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-muted">Frist: 10.12.2025</td>
+                <td class="col-num col-muted">—</td>
+              </tr>
+              <tr>
+                <td>November – Desember 2025</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-num">—</td>
+                <td class="col-muted">Frist: 10.02.2026</td>
+                <td class="col-num col-muted">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+      </div>
+    </main>
+
+  </div>
+</div>
+
+</body>
+</html>
