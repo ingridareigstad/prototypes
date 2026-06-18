@@ -105,6 +105,22 @@ Gi brukeren en kort oppsummering:
 - At dashbordet er oppdatert
 - Påminn om at de kan pushe via GitHub Desktop
 
+## Steg 6: Kjør linter og rett feil
+
+Kjør linting-scriptet på de nyopprettede filene:
+
+```bash
+node _system/lint.js prototyper/{navn}/
+```
+
+Les output nøye. Rett **alle feil** (`✖`) før du er ferdig:
+- Hex-farger → erstatt med semantisk token (`var(--action-primary-rest)` osv.)
+- Hardkodet `padding`/`margin`/`gap` i px → erstatt med `var(--space-*)` 
+- `font-weight: bold` / `700` → endre til `500`
+- `var(--global-*)` → erstatt med semantisk token
+
+Kjør lintere på nytt etter rettinger og bekreft at output er `✅ Ingen regelbrudd funnet.`
+
 ---
 
 ## Viktige regler som gjelder for alle prototyper
